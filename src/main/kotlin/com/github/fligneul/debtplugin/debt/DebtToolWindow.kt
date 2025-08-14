@@ -28,6 +28,22 @@ class DebtToolWindow(private val project: Project) {
 
         val priorityComboBox = JComboBox(Priority.values())
         table.columnModel.getColumn(4).cellEditor = DefaultCellEditor(priorityComboBox)
+
+        table.columnModel.getColumn(5).cellRenderer = DeleteButtonCell { row ->
+            val debtItem = tableModel.debtItems[row]
+            debtService.remove(debtItem)
+            updateTable()
+        }
+        table.columnModel.getColumn(5).cellEditor = DeleteButtonCell { row ->
+            val debtItem = tableModel.debtItems[row]
+            debtService.remove(debtItem)
+            updateTable()
+        }
+        table.columnModel.getColumn(5).preferredWidth = 30
+        table.columnModel.getColumn(5).maxWidth = 30
+        table.columnModel.getColumn(5).minWidth = 30
+
+        val debtFile = LocalFileSystem.getInstance().findFileByIoFile(debtService.debtFile)
     }
 
     fun getContent(): JPanel {

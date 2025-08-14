@@ -13,7 +13,7 @@ class DebtService(private val project: Project) {
 
     private val gson = Gson()
     private val settings = project.service<DebtSettings>()
-    private val debtFile by lazy {
+    val debtFile by lazy {
         File(project.basePath, settings.state.debtFilePath)
     }
     private val debts = mutableListOf<DebtItem>()

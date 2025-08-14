@@ -4,7 +4,7 @@ import javax.swing.table.DefaultTableModel
 
 class DebtTableModel(private val debtService: DebtService) : DefaultTableModel() {
 
-    private val debtItems = mutableListOf<DebtItem>() // Internal list to store DebtItem objects
+    val debtItems = mutableListOf<DebtItem>() // Internal list to store DebtItem objects
 
     init {
         addColumn("File")
@@ -12,6 +12,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         addColumn("Description")
         addColumn("Status")
         addColumn("Priority")
+        addColumn("")
     }
 
     override fun isCellEditable(row: Int, column: Int): Boolean {
@@ -23,6 +24,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         return when (columnIndex) {
             3 -> Status::class.java // Status column
             4 -> Priority::class.java // Priority column
+            5 -> Any::class.java // Action column (for button)
             else -> super.getColumnClass(columnIndex)
         }
     }
