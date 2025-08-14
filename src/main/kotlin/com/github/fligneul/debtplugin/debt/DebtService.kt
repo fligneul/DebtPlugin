@@ -32,6 +32,14 @@ class DebtService(private val project: Project) {
         saveDebts()
     }
 
+    fun update(oldDebtItem: DebtItem, newDebtItem: DebtItem) {
+        val index = debts.indexOf(oldDebtItem)
+        if (index != -1) {
+            debts[index] = newDebtItem
+            saveDebts()
+        }
+    }
+
     fun all(): List<DebtItem> {
         return debts.toList()
     }

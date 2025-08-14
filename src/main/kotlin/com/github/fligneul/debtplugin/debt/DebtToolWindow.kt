@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableModel
 class DebtToolWindow(private val project: Project) {
 
     private val debtService = project.service<DebtService>()
-    private val tableModel = DefaultTableModel(arrayOf("File", "Line", "Description"), 0)
+    private val tableModel = DebtTableModel(debtService)
     private val table = JBTable(tableModel)
 
     fun getContent(): JPanel {
@@ -53,9 +53,9 @@ class DebtToolWindow(private val project: Project) {
     }
 
     private fun updateTable() {
-        tableModel.rowCount = 0
+        tableModel.clearAll()
         debtService.all().forEach {
-            tableModel.addRow(arrayOf(it.file, it.line, it.description))
+            tableModel.addDebtItem(it)
         }
     }
 }
