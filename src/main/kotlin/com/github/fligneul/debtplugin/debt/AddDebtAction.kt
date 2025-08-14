@@ -13,20 +13,18 @@ class AddDebtAction : AnAction() {
         val editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val file = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
 
-        val description = Messages.showInputDialog(
-            project,
-            "Enter debt description:",
-            "New Debt",
-            Messages.getQuestionIcon()
-        ) ?: return
-
-        val debtService = project.service<DebtService>()
-        val debtItem = DebtItem(
-            file = file.path,
-            line = editor.caretModel.logicalPosition.line + 1,
-            description = description
-        )
-        debtService.add(debtItem)
+        val dialog = AddDebtDialog()
+        if (dialog.showAndGet()) {
+            val debtService = project.service<DebtService>()
+            val debtItem = DebtItem(
+                file = file.path,
+                line = editor.caretModel.logicalPosition.line + 1,
+                description = dialog.description,
+                status = dialog.status,
+                priority = dialog.priority
+            )
+            debtService.add(debtItem)
+        }
     }
 
     override fun update(e: AnActionEvent) {

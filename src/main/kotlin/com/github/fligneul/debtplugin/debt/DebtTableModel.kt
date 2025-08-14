@@ -10,6 +10,8 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         addColumn("File")
         addColumn("Line")
         addColumn("Description")
+        addColumn("Status")
+        addColumn("Priority")
     }
 
     override fun isCellEditable(row: Int, column: Int): Boolean {
@@ -17,20 +19,34 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         return column >= 2
     }
 
+    override fun getColumnClass(columnIndex: Int): Class<*> {
+        return when (columnIndex) {
+            3 -> Status::class.java // Status column
+            4 -> Priority::class.java // Priority column
+            else -> super.getColumnClass(columnIndex)
+        }
+    }
+
     override fun setValueAt(aValue: Any?, row: Int, column: Int) {
-        if (column == 2 && aValue is String) { // Only update description column
-            val oldDebtItem = debtItems[row] // Get the original DebtItem from our internal list
-            val updatedDebtItem = oldDebtItem.copy(description = aValue)
-            debtItems[row] = updatedDebtItem // Update internal list
-            debtService.update(oldDebtItem, updatedDebtItem) // Update in service
-            super.setValueAt(aValue, row, column) // Update table display
+        val oldDebtItem = debtItems[row]
+        val updatedDebtItem = when (column) {
+            2 -> oldDebtItem.copy(description = aValue as String)
+            3 -> oldDebtItem.copy(status = aValue as Status)
+            4 -> oldDebtItem.copy(priority = aValue as Priority)
+            else -> oldDebtItem
+        }
+
+        if (updatedDebtItem != oldDebtItem) {
+            debtItems[row] = updatedDebtItem
+            debtService.update(oldDebtItem, updatedDebtItem)
+            super.setValueAt(aValue, row, column)
         }
     }
 
     // Method to add DebtItem directly
     fun addDebtItem(debtItem: DebtItem) {
         debtItems.add(debtItem) // Add to internal list
-        addRow(arrayOf(debtItem.file, debtItem.line, debtItem.description)) // Add only visible data to DefaultTableModel
+        addRow(arrayOf(debtItem.file, debtItem.line, debtItem.description, debtItem.status, debtItem.priority)) // Add only visible data to DefaultTableModel
     }
 
     // Method to clear all debt items

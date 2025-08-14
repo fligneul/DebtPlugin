@@ -10,6 +10,8 @@ import com.intellij.ui.table.JBTable
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.DefaultCellEditor
+import javax.swing.JComboBox
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.table.DefaultTableModel
@@ -19,6 +21,14 @@ class DebtToolWindow(private val project: Project) {
     private val debtService = project.service<DebtService>()
     private val tableModel = DebtTableModel(debtService)
     private val table = JBTable(tableModel)
+
+    init {
+        val statusComboBox = JComboBox(Status.values())
+        table.columnModel.getColumn(3).cellEditor = DefaultCellEditor(statusComboBox)
+
+        val priorityComboBox = JComboBox(Priority.values())
+        table.columnModel.getColumn(4).cellEditor = DefaultCellEditor(priorityComboBox)
+    }
 
     fun getContent(): JPanel {
         val panel = JPanel(BorderLayout())
