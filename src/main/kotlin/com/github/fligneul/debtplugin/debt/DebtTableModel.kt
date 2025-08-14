@@ -12,6 +12,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         addColumn("Description")
         addColumn("Status")
         addColumn("Priority")
+        addColumn("Comment")
         addColumn("")
     }
 
@@ -24,7 +25,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
         return when (columnIndex) {
             3 -> Status::class.java // Status column
             4 -> Priority::class.java // Priority column
-            5 -> Any::class.java // Action column (for button)
+            6 -> Any::class.java // Action column (for button)
             else -> super.getColumnClass(columnIndex)
         }
     }
@@ -35,6 +36,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
             2 -> oldDebtItem.copy(description = aValue as String)
             3 -> oldDebtItem.copy(status = aValue as Status)
             4 -> oldDebtItem.copy(priority = aValue as Priority)
+            5 -> oldDebtItem.copy(comment = aValue as String)
             else -> oldDebtItem
         }
 
@@ -48,7 +50,7 @@ class DebtTableModel(private val debtService: DebtService) : DefaultTableModel()
     // Method to add DebtItem directly
     fun addDebtItem(debtItem: DebtItem) {
         debtItems.add(debtItem) // Add to internal list
-        addRow(arrayOf(debtItem.file, debtItem.line, debtItem.description, debtItem.status, debtItem.priority)) // Add only visible data to DefaultTableModel
+        addRow(arrayOf(debtItem.file, debtItem.line, debtItem.description, debtItem.status, debtItem.priority, debtItem.comment)) // Add only visible data to DefaultTableModel
     }
 
     // Method to clear all debt items

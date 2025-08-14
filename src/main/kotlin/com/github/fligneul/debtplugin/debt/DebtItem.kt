@@ -19,5 +19,6 @@ data class DebtItem(
     val line: Int,
     val description: String,
     val status: Status = Status.Submitted,
-    val priority: Priority = Priority.Medium
+    val priority: Priority = Priority.Medium,
+    val comment: String = ""
 )
