@@ -5,57 +5,68 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.table.JBTable
-import java.awt.BorderLayout
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import javax.swing.JButton
-import javax.swing.JPanel
-import javax.swing.table.DefaultTableModel
+import javafx.application.Platform
+import javafx.collections.FXCollections
+import javafx.embed.swing.JFXPanel
+import javafx.scene.Scene
+import javafx.scene.control.Button
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableView
+import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.input.MouseButton
+import javafx.scene.layout.BorderPane
+import javax.swing.JComponent
 
 class DebtToolWindow(private val project: Project) {
 
     private val debtService = project.service<DebtService>()
-    private val tableModel = DefaultTableModel(arrayOf("File", "Line", "Description"), 0)
-    private val table = JBTable(tableModel)
+    private val tableView = TableView<DebtItem>()
 
-    fun getContent(): JPanel {
-        val panel = JPanel(BorderLayout())
-        panel.add(JBScrollPane(table), BorderLayout.CENTER)
+    fun getContent(): JComponent {
+        val jfxPanel = JFXPanel()
+        Platform.runLater {
+            val root = BorderPane()
+            val scene = Scene(root, 800.0, 600.0)
+            jfxPanel.scene = scene
 
-        table.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 2) {
-                    val row = table.selectedRow
-                    if (row >= 0) {
-                        val file = table.getValueAt(row, 0) as String
-                        val line = table.getValueAt(row, 1) as Int
-                        val virtualFile = LocalFileSystem.getInstance().findFileByPath(file)
+            val fileColumn = TableColumn<DebtItem, String>("File")
+            fileColumn.cellValueFactory = PropertyValueFactory("file")
+
+            val lineColumn = TableColumn<DebtItem, Int>("Line")
+            lineColumn.cellValueFactory = PropertyValueFactory("line")
+
+            val descriptionColumn = TableColumn<DebtItem, String>("Description")
+            descriptionColumn.cellValueFactory = PropertyValueFactory("description")
+
+            tableView.columns.addAll(fileColumn, lineColumn, descriptionColumn)
+            root.center = tableView
+
+            tableView.setOnMouseClicked { event ->
+                if (event.button == MouseButton.PRIMARY && event.clickCount == 2) {
+                    val debtItem = tableView.selectionModel.selectedItem
+                    if (debtItem != null) {
+                        val virtualFile = LocalFileSystem.getInstance().findFileByPath(debtItem.file)
                         if (virtualFile != null) {
-                            val descriptor = OpenFileDescriptor(project, virtualFile, line - 1, 0)
+                            val descriptor = OpenFileDescriptor(project, virtualFile, debtItem.line - 1, 0)
                             FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
                         }
                     }
                 }
             }
-        })
 
-        val refreshButton = JButton("Refresh")
-        refreshButton.addActionListener {
+            val refreshButton = Button("Refresh")
+            refreshButton.setOnAction {
+                updateTable()
+            }
+            root.bottom = refreshButton
+
             updateTable()
         }
-        panel.add(refreshButton, BorderLayout.SOUTH)
-
-        updateTable()
-
-        return panel
+        return jfxPanel
     }
 
     private fun updateTable() {
-        tableModel.rowCount = 0
-        debtService.all().forEach {
-            tableModel.addRow(arrayOf(it.file, it.line, it.description))
-        }
+        val debtItems = FXCollections.observableArrayList(debtService.all())
+        tableView.items = debtItems
     }
 }

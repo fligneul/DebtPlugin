@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+    alias(libs.plugins.javafx)
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -17,6 +18,11 @@ version = providers.gradleProperty("pluginVersion").get()
 // Set the JVM language level used to build the project.
 kotlin {
     jvmToolchain(21)
+}
+
+javafx {
+    version = "21"
+    modules("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 // Configure project's dependencies
