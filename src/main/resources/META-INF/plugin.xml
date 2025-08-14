@@ -9,7 +9,16 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.fligneul.debtplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.fligneul.debtplugin.startup.MyProjectActivity" />
+        <toolWindow id="Technical Debt" anchor="bottom" factoryClass="com.github.fligneul.debtplugin.debt.DebtToolWindowFactory"/>
     </extensions>
+
+    <actions>
+        <action id="com.github.fligneul.debtplugin.debt.AddDebtAction"
+                class="com.github.fligneul.debtplugin.debt.AddDebtAction"
+                text="Add Debt"
+                description="Add a new debt to the project."
+                icon="AllIcons.General.Add">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
